@@ -60,6 +60,34 @@ Options via environment variables, e.g. `EPOCHS=120 ./training/retrain.sh`:
 | `IMGSZ`  | 640 | training image size |
 | `BASE`   | `training/best.pt` | weights to start from |
 
+### Improving accuracy (false positives / missed teeth)
+
+Field testing shows the current model both false-alarms on tooth-shaped debris
+and misses real teeth. That's the expected *domain gap*: it was trained on
+museum photos (one clean tooth, large in frame, plain background), so it never
+learned what shells and rocks look like, and real teeth in clutter look nothing
+like its training data. Both error types at once means threshold tuning can't
+fix it — raising the bar trades misses for false alarms and vice versa. Only
+better training data fixes it. In order of impact:
+
+1. **Labeled beach photos (~50–150).** Shoot teeth with the iPhone in real
+   hunting conditions: on sand, in shell hash, on gravel, wet and dry, varied
+   distance and light. Draw a box around each tooth (Roboflow or Label Studio,
+   free tiers, YOLO export format), then run
+   `./training/retrain.sh path/to/data.yaml`.
+2. **Hard negatives — nearly free.** Photos of beach ground with *no* teeth
+   (the shells and rocks currently fooling it) need no labeling: add them to
+   the training images with empty label files and the model learns "not a
+   tooth." Even 30–50 of these noticeably cuts false positives.
+3. **Get closer.** The model saw large-in-frame teeth in training, so hold the
+   phone 8–20 inches from the ground. Small, distant teeth will be missed
+   regardless of training.
+
+App-side knobs (in `SharkToothAR/ToothDetector.swift` and
+`ARViewContainer.swift`): the per-detection confidence cutoff (default 0.5)
+and the streak length before a marker locks (default 4 passes). These trade
+off false pins against responsiveness but can't fix the underlying model.
+
 What's in `training/`:
 
 - `retrain.sh` — the one-command pipeline described above
