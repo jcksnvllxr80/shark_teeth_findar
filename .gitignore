@@ -1,0 +1,13 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+
+# The .xcodeproj is generated from project.yml by xcodegen.
+# Keeping it ignored avoids merge pain; run `xcodegen generate` after cloning.
+SharkToothAR.xcodeproj/
+
+# macOS
+.DS_Store

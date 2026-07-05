@@ -1,0 +1,26 @@
+name: SharkToothAR
+options:
+  bundleIdPrefix: com.acwatkins
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  SharkToothAR:
+    type: application
+    platform: iOS
+    sources:
+      - SharkToothAR
+    info:
+      path: SharkToothAR/Info.plist
+      properties:
+        CFBundleDisplayName: Shark Teeth
+        UILaunchScreen: {}
+        NSCameraUsageDescription: Shark Teeth uses the camera to find shark teeth in augmented reality.
+        UIRequiredDeviceCapabilities: [arkit]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIRequiresFullScreen: true
