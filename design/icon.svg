@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="ocean" cx="50%" cy="38%" r="85%">
+      <stop offset="0%" stop-color="#1E7FBF"/>
+      <stop offset="55%" stop-color="#10577F"/>
+      <stop offset="100%" stop-color="#082D45"/>
+    </radialGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FDFBF4"/>
+      <stop offset="60%" stop-color="#EFE8D6"/>
+      <stop offset="100%" stop-color="#CDBFA0"/>
+    </linearGradient>
+    <linearGradient id="rootshade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D8CBAD"/>
+      <stop offset="100%" stop-color="#EFE8D6"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="28" flood-color="#031A2B" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="1024" fill="url(#ocean)"/>
+
+  <!-- tooth -->
+  <g filter="url(#drop)">
+    <!-- root (two lobes) -->
+    <path d="M 372 392
+             C 356 326, 398 288, 446 302
+             Q 512 356 578 302
+             C 626 288, 668 326, 652 392
+             L 652 430 L 372 430 Z"
+          fill="url(#rootshade)"/>
+    <!-- crown -->
+    <path d="M 372 392
+             C 380 420, 640 420, 652 392
+             C 638 508, 592 626, 504 726
+             C 428 634, 388 510, 372 392
+             Z"
+          fill="url(#ivory)"/>
+    <!-- enamel sheen -->
+    <path d="M 448 440
+             C 452 520, 470 590, 502 660
+             C 470 588, 458 516, 460 442
+             Z"
+          fill="#FFFFFF" opacity="0.55"/>
+  </g>
+
+  <!-- AR viewfinder brackets -->
+  <g stroke="#FFD60A" stroke-width="34" stroke-linecap="round" fill="none">
+    <path d="M 232 330 L 232 226 L 336 226"/>
+    <path d="M 688 226 L 792 226 L 792 330"/>
+    <path d="M 792 694 L 792 798 L 688 798"/>
+    <path d="M 336 798 L 232 798 L 232 694"/>
+  </g>
+</svg>

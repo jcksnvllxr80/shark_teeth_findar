@@ -9,5 +9,10 @@ xcuserdata/
 # Keeping it ignored avoids merge pain; run `xcodegen generate` after cloning.
 SharkToothAR.xcodeproj/
 
+# Training workspace (recreated by training/retrain.sh)
+training/venv/
+training/work/
+training/best.prev.pt
+
 # macOS
 .DS_Store

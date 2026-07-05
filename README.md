@@ -13,19 +13,62 @@ in AR world space so the box stays put even when you move the phone.
   and **locks a yellow square marker** onto the real surface. It stays anchored
   there as you move around.
 
-### Demo mode vs. real model
+### The detection model
 
-There is no built-in "shark tooth" detector in iOS, so the app has two modes:
+The app ships with `SharkToothAR/SharkToothDetector.mlpackage`, a YOLOv8-nano
+detector fine-tuned on the open [RF100 shark-teeth dataset](https://universe.roboflow.com/roboflow-100/shark-teeth-5atku)
+(280 images of fossil teeth, CC license, via its
+[Hugging Face mirror](https://huggingface.co/datasets/Francesco/shark-teeth-5atku)).
+Validation results: 99.6% precision, 100% recall, 0.995 mAP@50. It was exported
+to Core ML with a built-in NMS pipeline, so Vision returns ready-to-use labeled
+boxes. The status bar shows "Shark tooth model loaded" when it's active.
 
-- **Demo mode (default):** uses Apple's generic *salient object* detector, which
-  boxes anything that visually stands out. This proves the whole
-  camera → detection → box → AR-lock pipeline works before any training.
-- **Real model:** train an *Object Detection* model in Apple's free **Create ML**
-  app (comes with Xcode: `Xcode → Open Developer Tool → Create ML`) using photos
-  of shark teeth with labeled rectangles. Export it as `SharkToothDetector.mlmodel`,
-  drop the file into the `SharkToothAR/` folder, re-run `xcodegen generate`, and
-  rebuild. The app picks it up automatically — the status bar at the top tells
-  you which mode is active.
+**Expectation setting:** the training photos are museum-style specimens (clean
+tooth, plain background), so it works best on a tooth on a table or in your
+hand. A tooth half-buried in shell hash will be hit-or-miss until the model is
+retrained with real beach photos.
+
+If the model file is ever removed, the app falls back to Apple's generic
+*salient object* detector (labeled "demo mode" in the status bar) so the
+AR pipeline still works.
+
+### Retraining: one command
+
+```sh
+./training/retrain.sh
+```
+
+That single command does everything: creates the Python environment if needed
+(one-time, ~2 GB download), fetches the RF100 dataset, fine-tunes the model on
+the Mac's GPU, exports to Core ML, installs the result as
+`SharkToothAR/SharkToothDetector.mlpackage`, and regenerates the Xcode project.
+When it says "Done", open Xcode and press ⌘R — the next build uses the new model.
+
+To train on **your own photos** (the big accuracy win for beach conditions):
+label them in YOLO format (Roboflow or Label Studio make this easy — draw a
+rectangle around each tooth), then:
+
+```sh
+./training/retrain.sh path/to/your/data.yaml
+```
+
+Options via environment variables, e.g. `EPOCHS=120 ./training/retrain.sh`:
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `EPOCHS` | 80 | training epochs |
+| `IMGSZ`  | 640 | training image size |
+| `BASE`   | `training/best.pt` | weights to start from |
+
+What's in `training/`:
+
+- `retrain.sh` — the one-command pipeline described above
+- `best.pt` — current trained weights; each retrain updates this and keeps the
+  previous version as `best.prev.pt` (set `BASE=training/best.prev.pt` to roll back)
+- `coco_to_yolo.py` — converts the RF100 COCO download to YOLO format
+- `export_coreml.py` — exports any `.pt` weights to Vision-compatible Core ML
+- `results.png`, `val_batch0_pred.jpg` — training curves and sample predictions
+- `venv/`, `work/` — environment and scratch space the script manages (gitignored)
 
 ## Building and running (first time)
 
@@ -66,4 +109,8 @@ SharkToothAR/
   ToothDetector.swift            # Vision pipeline (Core ML model or demo fallback)
   DetectionOverlayView.swift     # draws the live 2D bounding boxes
   AppState.swift                 # shared state between AR session and UI
+  SharkToothDetector.mlpackage   # trained YOLOv8n shark tooth model (Core ML)
+  Assets.xcassets/               # app icon
+training/                        # trained weights + scripts to retrain/export
+design/icon.svg                  # editable app icon source
 ```
